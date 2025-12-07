@@ -6,4 +6,5 @@ app_name = 'finance'
 urlpatterns = [
     path('', views.home, name='home'),
     path('balance/', views.balance_list, name='balance_list'),
+    path('income/', views.income_list, name='income_list'),
 ]

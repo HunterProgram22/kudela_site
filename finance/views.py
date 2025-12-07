@@ -55,3 +55,24 @@ def balance_list(request):
     }
 
     return render(request, 'finance/balance_list.html', context)
+
+
+def income_list(request):
+    # Get all income records
+    incomes = MonthInc.objects.all()
+
+    # Get filter parameters
+    year = request.GET.get('year')
+    if year:
+        incomes = incomes.filter(date__year=year)
+
+    # Get available years for filter dropdown
+    available_years = MonthInc.objects.dates('date', 'year', order='DESC')
+
+    context = {
+        'incomes': incomes,
+        'available_years': available_years,
+        'selected_year': year,
+    }
+
+    return render(request, 'finance/income_list.html', context)

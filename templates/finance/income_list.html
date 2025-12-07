@@ -1,0 +1,78 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Income Statement</h1>
+        <p class="text-slate-600">Monthly income and expenses</p>
+    </div>
+
+    <!-- Year Filter -->
+    <form method="get" class="flex items-center gap-3">
+        <select name="year" class="bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Years</option>
+            {% for date in available_years %}
+                <option value="{{ date.year }}" {% if selected_year == date.year|stringformat:"s" %}selected{% endif %}>
+                    {{ date.year }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition">
+            Filter
+        </button>
+    </form>
+</div>
+
+<!-- Income Table -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-700 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold">Date</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Salary</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Other Income</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Total Income</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Taxes</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Housing</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Utilities</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Savings</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Expenses</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Surplus</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                {% for income in incomes %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-4 text-slate-800 font-medium">{{ income.date|date:"M Y" }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ income.total_salary|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ income.total_other_income|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-emerald-600 font-medium">${{ income.total_income|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ income.total_taxes|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ income.total_housing|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ income.total_utilities|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-blue-600">${{ income.total_allsavings|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-rose-600 font-medium">${{ income.total_expenses|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right font-bold {% if income.total_surplus >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                        ${{ income.total_surplus|floatformat:0|intcomma }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="px-6 py-8 text-center text-slate-500">No income records found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Summary -->
+{% if incomes %}
+<div class="mt-6 text-sm text-slate-600">
+    Showing {{ incomes|length }} record{{ incomes|length|pluralize }}
+</div>
+{% endif %}
+{% endblock %}
