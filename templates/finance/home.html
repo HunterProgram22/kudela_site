@@ -1,10 +1,17 @@
 {% extends 'finance/base.html' %}
+{% load humanize %}
 
 {% block finance_content %}
 <!-- Page Header -->
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-800">Financial Dashboard</h1>
-    <p class="text-slate-600">Overview of your financial status</p>
+    <p class="text-slate-600">
+        {% if latest_balance %}
+            As of {{ latest_balance.date|date:"F Y" }}
+        {% else %}
+            Overview of your financial status
+        {% endif %}
+    </p>
 </div>
 
 <!-- Summary Cards -->
@@ -15,16 +22,24 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-slate-300 uppercase tracking-wide">Net Worth</p>
-                <p class="text-2xl font-bold">$---,---</p>
+                <p class="text-2xl font-bold">
+                    {% if latest_balance %}
+                        ${{ latest_balance.networth|floatformat:0|intcomma }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </p>
             </div>
             <div class="bg-slate-600 p-3 rounded-full">
                 <i data-lucide="wallet" class="w-6 h-6 text-blue-300"></i>
             </div>
         </div>
+        {% if latest_income %}
         <p class="text-sm text-emerald-300 mt-2">
             <i data-lucide="trending-up" class="w-4 h-4 inline"></i>
-            Data coming soon
+            ${{ latest_income.total_surplus|floatformat:0|intcomma }} surplus this month
         </p>
+        {% endif %}
     </div>
 
     <!-- Total Assets Card -->
@@ -32,7 +47,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-slate-500 uppercase tracking-wide">Total Assets</p>
-                <p class="text-2xl font-bold text-slate-800">$---,---</p>
+                <p class="text-2xl font-bold text-slate-800">
+                    {% if latest_balance %}
+                        ${{ latest_balance.total_assets|floatformat:0|intcomma }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </p>
             </div>
             <div class="bg-emerald-100 p-3 rounded-full">
                 <i data-lucide="trending-up" class="w-6 h-6 text-emerald-600"></i>
@@ -46,7 +67,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-slate-500 uppercase tracking-wide">Total Liabilities</p>
-                <p class="text-2xl font-bold text-slate-800">$---,---</p>
+                <p class="text-2xl font-bold text-slate-800">
+                    {% if latest_balance %}
+                        ${{ latest_balance.total_liabilities|floatformat:0|intcomma }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </p>
             </div>
             <div class="bg-rose-100 p-3 rounded-full">
                 <i data-lucide="trending-down" class="w-6 h-6 text-rose-600"></i>
@@ -60,14 +87,137 @@
 <!-- Chart Section -->
 <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6 mb-6">
     <h2 class="text-lg font-semibold text-slate-800 mb-4">Net Worth Over Time</h2>
-    <div class="h-64 flex items-center justify-center bg-slate-100 rounded-lg border border-slate-200">
-        <p class="text-slate-400">Chart will display here once connected to data</p>
+    {% if chart_labels %}
+    <div class="h-64">
+        <canvas id="networthChart"></canvas>
     </div>
+    {% else %}
+    <div class="h-64 flex items-center justify-center bg-slate-100 rounded-lg border border-slate-200">
+        <p class="text-slate-400">Add balance records to see chart</p>
+    </div>
+    {% endif %}
 </div>
 
-<!-- Recent Activity -->
-<div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
-    <h2 class="text-lg font-semibold text-slate-800 mb-4">Recent Activity</h2>
-    <p class="text-slate-500">No recent data to display yet.</p>
+<!-- Account Breakdown -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Assets Breakdown -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Assets Breakdown</h2>
+        {% if latest_balance %}
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Checking</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_check|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Savings</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_save|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Investments</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_invest|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Retirement</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_retire|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Property</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_property|floatformat:0|intcomma }}</span>
+            </div>
+            <hr class="border-slate-200">
+            <div class="flex justify-between items-center">
+                <span class="font-semibold text-slate-800">Total</span>
+                <span class="font-bold text-emerald-600">${{ latest_balance.total_assets|floatformat:0|intcomma }}</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-slate-500">No data available</p>
+        {% endif %}
+    </div>
+
+    <!-- Liabilities Breakdown -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Liabilities Breakdown</h2>
+        {% if latest_balance %}
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Credit Cards</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_credit|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-slate-600">Loans</span>
+                <span class="font-medium text-slate-800">${{ latest_balance.total_loan|floatformat:0|intcomma }}</span>
+            </div>
+            <hr class="border-slate-200">
+            <div class="flex justify-between items-center">
+                <span class="font-semibold text-slate-800">Total</span>
+                <span class="font-bold text-rose-600">${{ latest_balance.total_liabilities|floatformat:0|intcomma }}</span>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-slate-500">No data available</p>
+        {% endif %}
+    </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if chart_labels %}
+<script>
+    const ctx = document.getElementById('networthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [
+                {
+                    label: 'Net Worth',
+                    data: {{ chart_networth|safe }},
+                    borderColor: 'rgb(59, 130, 246)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Assets',
+                    data: {{ chart_assets|safe }},
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    tension: 0.3
+                },
+                {
+                    label: 'Liabilities',
+                    data: {{ chart_liabilities|safe }},
+                    borderColor: 'rgb(244, 63, 94)',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
 {% endblock %}
