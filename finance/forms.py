@@ -37,6 +37,9 @@ class TaxReturnForm(forms.ModelForm):
     class Meta:
         model = TaxReturn
         fields = '__all__'
+        widgets = {
+            'year': forms.DateInput(attrs={'type': 'date'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

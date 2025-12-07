@@ -37,7 +37,7 @@
             <tbody class="divide-y divide-slate-200">
                 {% for tax in taxes %}
                 <tr class="hover:bg-slate-100 transition">
-                    <td class="px-6 py-4 text-slate-800 font-medium">{{ tax.year }}</td>
+                    <td class="px-6 py-4 text-slate-800 font-medium">{{ tax.year|date:"Y" }}</td>
                     <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_job_wages|floatformat:0|intcomma }}</td>
                     <td class="px-6 py-4 text-right text-slate-600">${{ tax.adjusted_gross_income|floatformat:0|intcomma }}</td>
                     <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_federal_tax_owed|floatformat:0|intcomma }}</td>

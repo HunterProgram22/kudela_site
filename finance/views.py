@@ -287,6 +287,7 @@ def tax_edit(request, pk):
         'form': form,
         'editing': True,
         'tax': tax,
+        'tax_year': tax.year.year,
     }
 
     return render(request, 'finance/tax_form.html', context)

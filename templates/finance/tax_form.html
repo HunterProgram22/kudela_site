@@ -7,7 +7,7 @@
         {% if editing %}Edit Tax Return{% else %}Add Tax Return{% endif %}
     </h1>
     <p class="text-slate-600">
-        {% if editing %}Update {{ tax.year }} tax return{% else %}Enter annual tax return data{% endif %}
+        {% if editing %}Update {{ tax_year }} tax return{% else %}Enter annual tax return data{% endif %}
     </p>
 </div>
 
@@ -17,6 +17,7 @@
     <!-- Year -->
     <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
         <h2 class="text-lg font-semibold text-slate-800 mb-4">Tax Year</h2>
+         <p class="text-sm text-slate-500 mb-1">Enter January 1st of the tax year</p>
         <div class="max-w-xs">
             {{ form.year }}
         </div>

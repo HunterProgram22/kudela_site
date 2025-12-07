@@ -286,7 +286,7 @@ class MonthInc(models.Model):
 class TaxReturn(models.Model):
     """Annual tax return summary."""
 
-    year = models.IntegerField()
+    year = models.DateField()
     total_job_wages = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     total_federal_wages = models.DecimalField(max_digits=10, decimal_places=2,
                                               default=Decimal('0.00'))
