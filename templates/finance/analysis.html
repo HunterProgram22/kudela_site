@@ -10,52 +10,74 @@
 
 <!-- Filters -->
 <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6 mb-6">
-    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+    <form method="get" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
-        <!-- Data Type -->
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Data Type</label>
-            <select name="type" id="dataType" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="balance" {% if data_type == 'balance' %}selected{% endif %}>Balance Sheet</option>
-                <option value="income" {% if data_type == 'income' %}selected{% endif %}>Income Statement</option>
-            </select>
-        </div>
+            <!-- Data Type -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Data Type</label>
+                <select name="type" id="dataType" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="balance" {% if data_type == 'balance' %}selected{% endif %}>Balance Sheet</option>
+                    <option value="income" {% if data_type == 'income' %}selected{% endif %}>Income Statement</option>
+                </select>
+            </div>
 
-        <!-- Category -->
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Category</label>
-            <select name="category" id="categorySelect" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <optgroup label="Balance Sheet" id="balanceOptions" {% if data_type == 'income' %}disabled{% endif %}>
-                    {% for name, value in balance_categories.items %}
-                        <option value="{{ value }}" {% if category == value and data_type == 'balance' %}selected{% endif %}>{{ name }}</option>
+            <!-- Category -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                <select name="category" id="categorySelect" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <!-- Balance Summary -->
+                    <optgroup label="Balance Summary" class="balance-options">
+                        {% for name, value in balance_summary.items %}
+                            <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <!-- Balance Detail -->
+                    <optgroup label="Balance Accounts" class="balance-options balance-detail" {% if not show_detail %}style="display:none"{% endif %}>
+                        {% for name, value in balance_detail.items %}
+                            <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <!-- Income Summary -->
+                    <optgroup label="Income Summary" class="income-options">
+                        {% for name, value in income_summary.items %}
+                            <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                    <!-- Income Detail -->
+                    <optgroup label="Income Accounts" class="income-options income-detail" {% if not show_detail %}style="display:none"{% endif %}>
+                        {% for name, value in income_detail.items %}
+                            <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Year Filter -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
+                <select name="year" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Years</option>
+                    {% for date in available_years %}
+                        <option value="{{ date.year }}" {% if selected_year == date.year|stringformat:"s" %}selected{% endif %}>
+                            {{ date.year }}
+                        </option>
                     {% endfor %}
-                </optgroup>
-                <optgroup label="Income Statement" id="incomeOptions" {% if data_type == 'balance' %}disabled{% endif %}>
-                    {% for name, value in income_categories.items %}
-                        <option value="{{ value }}" {% if category == value and data_type == 'income' %}selected{% endif %}>{{ name }}</option>
-                    {% endfor %}
-                </optgroup>
-            </select>
+                </select>
+            </div>
+
+            <!-- Submit -->
+            <div>
+                <button type="submit" class="w-full bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition">
+                    Update Chart
+                </button>
+            </div>
         </div>
 
-        <!-- Year Filter -->
-        <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
-            <select name="year" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">All Years</option>
-                {% for date in available_years %}
-                    <option value="{{ date.year }}" {% if selected_year == date.year|stringformat:"s" %}selected{% endif %}>
-                        {{ date.year }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <!-- Submit -->
-        <div>
-            <button type="submit" class="w-full bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition">
-                Update Chart
-            </button>
+        <!-- Show Detail Toggle -->
+        <div class="flex items-center gap-2">
+            <input type="checkbox" name="detail" id="showDetail" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" {% if show_detail %}checked{% endif %}>
+            <label for="showDetail" class="text-sm text-slate-700">Show individual accounts</label>
         </div>
     </form>
 </div>
@@ -72,7 +94,7 @@
         <canvas id="analysisChart"></canvas>
     </div>
 
-        <!-- Summary Stats -->
+    <!-- Summary Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200">
         <div>
             <p class="text-sm text-slate-500">Current</p>
@@ -91,7 +113,6 @@
             <p class="text-xl font-bold text-slate-800">{{ chart_labels|length }}</p>
         </div>
     </div>
-
     {% else %}
     <div class="h-96 flex items-center justify-center bg-slate-100 rounded-lg">
         <p class="text-slate-400">No data available for the selected criteria</p>
@@ -101,12 +122,57 @@
 {% endblock %}
 
 {% block extra_js %}
-{% if chart_labels %}
 <script>
+    // Show/hide category options based on data type and detail checkbox
+    function updateCategoryOptions() {
+        const dataType = document.getElementById('dataType').value;
+        const showDetail = document.getElementById('showDetail').checked;
+        const select = document.getElementById('categorySelect');
+
+        // Show/hide optgroups based on data type
+        document.querySelectorAll('.balance-options').forEach(el => {
+            el.style.display = dataType === 'balance' ? '' : 'none';
+        });
+        document.querySelectorAll('.income-options').forEach(el => {
+            el.style.display = dataType === 'income' ? '' : 'none';
+        });
+
+        // Show/hide detail optgroups based on checkbox
+        document.querySelectorAll('.balance-detail, .income-detail').forEach(el => {
+            if (showDetail) {
+                // Only show if it's the right data type
+                if ((dataType === 'balance' && el.classList.contains('balance-detail')) ||
+                    (dataType === 'income' && el.classList.contains('income-detail'))) {
+                    el.style.display = '';
+                }
+            } else {
+                el.style.display = 'none';
+            }
+        });
+
+        // Reset to default if current selection is hidden
+        const currentOption = select.querySelector(`option[value="${select.value}"]`);
+        if (currentOption) {
+            const parentGroup = currentOption.closest('optgroup');
+            if (parentGroup && parentGroup.style.display === 'none') {
+                select.value = dataType === 'balance' ? 'networth' : 'total_income';
+            }
+        }
+    }
+
+    document.getElementById('dataType').addEventListener('change', updateCategoryOptions);
+    document.getElementById('showDetail').addEventListener('change', updateCategoryOptions);
+
+    // Initialize on page load
+    updateCategoryOptions();
+
+    {% if chart_labels %}
+    // Chart
     const ctx = document.getElementById('analysisChart').getContext('2d');
 
-    // Determine color based on data type
-    const isLiability = ['total_liabilities', 'total_credit', 'total_loan', 'total_expenses', 'total_taxes'].includes('{{ category }}');
+    const isLiability = ['total_liabilities', 'total_credit', 'total_loan', 'total_expenses', 'total_taxes',
+                         'capone_credit', 'amex_credit', 'discover_credit', 'car_loan', 'pubstudent_loan',
+                         'privstudent_loan', 'main_mortgage'].includes('{{ category }}');
     const borderColor = isLiability ? 'rgb(244, 63, 94)' : 'rgb(16, 185, 129)';
     const backgroundColor = isLiability ? 'rgba(244, 63, 94, 0.1)' : 'rgba(16, 185, 129, 0.1)';
 
@@ -151,23 +217,6 @@
             }
         }
     });
-
-    // Update category options based on data type selection
-    document.getElementById('dataType').addEventListener('change', function() {
-        const balanceOptions = document.getElementById('balanceOptions');
-        const incomeOptions = document.getElementById('incomeOptions');
-        const categorySelect = document.getElementById('categorySelect');
-
-        if (this.value === 'balance') {
-            balanceOptions.disabled = false;
-            incomeOptions.disabled = true;
-            categorySelect.value = 'networth';
-        } else {
-            balanceOptions.disabled = true;
-            incomeOptions.disabled = false;
-            categorySelect.value = 'total_income';
-        }
-    });
+    {% endif %}
 </script>
-{% endif %}
 {% endblock %}

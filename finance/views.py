@@ -295,8 +295,8 @@ def tax_edit(request, pk):
 
 @login_required
 def analysis(request):
-    # Define available categories for analysis
-    balance_categories = {
+    # Summary categories (groups)
+    balance_summary = {
         'Net Worth': 'networth',
         'Total Assets': 'total_assets',
         'Total Liabilities': 'total_liabilities',
@@ -309,7 +309,34 @@ def analysis(request):
         'Loans': 'total_loan',
     }
 
-    income_categories = {
+    # Detailed categories (individual accounts)
+    balance_detail = {
+        'Huntington Checking': 'huntington_check',
+        'Fifth Third Checking': 'fifththird_check',
+        'Huntington Savings': 'huntington_save',
+        'Fifth Third Savings': 'fifththird_save',
+        'Capital One Savings': 'capone_save',
+        'Amex Savings': 'amex_save',
+        'Robinhood': 'robinhood_invest',
+        'Deacon': 'deacon_invest',
+        'Buckeye': 'buckeye_invest',
+        'OPERS': 'opers_retire',
+        '457 Retirement': 'four57_retire',
+        '401k': 'four01_retire',
+        'Roth IRA': 'roth_retire',
+        'Main Home': 'main_home',
+        'Justin Car': 'justin_car',
+        'Kat Car': 'kat_car',
+        'Capital One Credit': 'capone_credit',
+        'Amex Credit': 'amex_credit',
+        'Discover Credit': 'discover_credit',
+        'Car Loan': 'car_loan',
+        'Public Student Loan': 'pubstudent_loan',
+        'Private Student Loan': 'privstudent_loan',
+        'Mortgage': 'main_mortgage',
+    }
+
+    income_summary = {
         'Total Income': 'total_income',
         'Total Salary': 'total_salary',
         'Total Expenses': 'total_expenses',
@@ -320,19 +347,48 @@ def analysis(request):
         'Total Housing': 'total_housing',
     }
 
+    income_detail = {
+        'Supreme Court Salary': 'supremecourt_salary',
+        'CDM Salary': 'cdm_salary',
+        'Federal Tax': 'federal_tax',
+        'Social Security': 'social_security',
+        'Medicare': 'medicare',
+        'Ohio Tax': 'ohio_tax',
+        'Columbus Tax': 'columbus_tax',
+        'Health Insurance': 'health_insurance',
+        'Mortgage Payment': 'main_mortgage',
+        'HOA Fees': 'hoa_fees',
+        'Auto Insurance': 'auto_insurance',
+        'AEP Electric': 'aep_electric',
+        'Rumpke Trash': 'rumpke_trash',
+        'Delaware Sewer': 'delaware_sewer',
+        'Delco Water': 'delco_water',
+        'Suburban Gas': 'suburban_gas',
+        'Verizon (Kat)': 'verizon_kat',
+        'Sprint (Justin)': 'sprint_justin',
+        'DirecTV': 'directtv_cable',
+        'Internet': 'timewarner_internet',
+        'Capital One CC': 'capone_creditcard',
+        'Amex CC': 'amex_creditcard',
+        'Discover CC': 'discover_creditcard',
+        'Daycare': 'daycare',
+        'Cash/Check': 'cashorcheck_purchases',
+    }
+
     # Get filter parameters
     data_type = request.GET.get('type', 'balance')
     category = request.GET.get('category', 'networth')
     year = request.GET.get('year', '')
+    show_detail = request.GET.get('detail', '') == 'on'
 
-    # Determine which categories to show
+    # Combine summary and detail based on type
     if data_type == 'income':
-        categories = income_categories
-        if category not in income_categories.values():
+        all_categories = {**income_summary, **income_detail} if show_detail else income_summary
+        if category not in all_categories.values():
             category = 'total_income'
     else:
-        categories = balance_categories
-        if category not in balance_categories.values():
+        all_categories = {**balance_summary, **balance_detail} if show_detail else balance_summary
+        if category not in all_categories.values():
             category = 'networth'
 
     # Get data based on type
@@ -353,19 +409,19 @@ def analysis(request):
 
     for record in queryset:
         chart_labels.append(record.date.strftime('%b %Y'))
-        # Get the value - either call the method or get the attribute
         value = getattr(record, category)
         if callable(value):
             value = value()
         chart_data.append(float(value))
 
     # Get current category display name
-    all_categories = {**balance_categories, **income_categories}
-    category_name = [k for k, v in all_categories.items() if v == category][
-        0] if category in all_categories.values() else category
+    all_possible = {**balance_summary, **balance_detail, **income_summary, **income_detail}
+    category_name = [k for k, v in all_possible.items() if v == category][
+        0] if category in all_possible.values() else category
 
+    # Calculate stats
     if chart_data:
-        current_value = chart_data[-1] if chart_data else 0
+        current_value = chart_data[-1]
         highest_value = max(chart_data)
         lowest_value = min(chart_data)
     else:
@@ -378,8 +434,11 @@ def analysis(request):
         'category': category,
         'category_name': category_name,
         'selected_year': year,
-        'balance_categories': balance_categories,
-        'income_categories': income_categories,
+        'show_detail': show_detail,
+        'balance_summary': balance_summary,
+        'balance_detail': balance_detail,
+        'income_summary': income_summary,
+        'income_detail': income_detail,
         'available_years': available_years,
         'chart_labels': chart_labels,
         'chart_data': chart_data,
