@@ -44,21 +44,25 @@ def home(request):
 
 @login_required
 def balance_list(request):
-    # Get all balance records
     balances = MonthBal.objects.all()
 
     # Get filter parameters
     year = request.GET.get('year')
+    month = request.GET.get('month')
+
     if year:
         balances = balances.filter(date__year=year)
+    if month:
+        balances = balances.filter(date__month=month)
 
-    # Get available years for filter dropdown
+    # Get available years and months for filter dropdowns
     available_years = MonthBal.objects.dates('date', 'year', order='DESC')
 
     context = {
         'balances': balances,
         'available_years': available_years,
         'selected_year': year,
+        'selected_month': month,
     }
 
     return render(request, 'finance/balance_list.html', context)
@@ -66,13 +70,16 @@ def balance_list(request):
 
 @login_required
 def income_list(request):
-    # Get all income records
     incomes = MonthInc.objects.all()
 
     # Get filter parameters
     year = request.GET.get('year')
+    month = request.GET.get('month')
+
     if year:
         incomes = incomes.filter(date__year=year)
+    if month:
+        incomes = incomes.filter(date__month=month)
 
     # Get available years for filter dropdown
     available_years = MonthInc.objects.dates('date', 'year', order='DESC')
@@ -81,6 +88,7 @@ def income_list(request):
         'incomes': incomes,
         'available_years': available_years,
         'selected_year': year,
+        'selected_month': month,
     }
 
     return render(request, 'finance/income_list.html', context)
