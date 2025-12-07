@@ -1,0 +1,231 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Quarterly Reports</h1>
+    <p class="text-slate-600">Compare quarterly financial performance</p>
+</div>
+
+<!-- Quarter Selector -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6 mb-6">
+    <form method="get" class="flex items-end gap-4">
+        <div class="flex-1 max-w-xs">
+            <label class="block text-sm font-medium text-slate-700 mb-1">Select Quarter</label>
+            <select name="quarter" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {% for option in quarter_options %}
+                    <option value="{{ option.value }}" {% if selected_quarter == option.value %}selected{% endif %}>
+                        {{ option.label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="bg-slate-700 text-white px-6 py-2 rounded-lg hover:bg-slate-600 transition">
+            View Report
+        </button>
+    </form>
+</div>
+
+{% if quarter_data %}
+<!-- Comparison Table -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 overflow-hidden mb-6">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-700 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold">Metric</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">{{ quarter_data.name }}</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">{{ last_quarter_data.name }}</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">vs Last Qtr</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">{{ year_ago_data.name }}</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">vs Year Ago</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                <!-- Income Section -->
+                <tr class="bg-slate-100">
+                    <td colspan="6" class="px-6 py-2 font-semibold text-slate-700">Income & Expenses</td>
+                </tr>
+
+                {% with current=quarter_data.income last=last_quarter_data.income year_ago=year_ago_data.income %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-3 text-slate-800">Total Income</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ current|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ last|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > last %}text-emerald-600{% elif current < last %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if last %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ year_ago|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > year_ago %}text-emerald-600{% elif current < year_ago %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if year_ago %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                {% with current=quarter_data.expenses last=last_quarter_data.expenses year_ago=year_ago_data.expenses %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-3 text-slate-800">Total Expenses</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ current|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ last|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current < last %}text-emerald-600{% elif current > last %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if last %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ year_ago|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current < year_ago %}text-emerald-600{% elif current > year_ago %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if year_ago %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                {% with current=quarter_data.savings last=last_quarter_data.savings year_ago=year_ago_data.savings %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-3 text-slate-800">Total Savings</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ current|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ last|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > last %}text-emerald-600{% elif current < last %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if last %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ year_ago|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > year_ago %}text-emerald-600{% elif current < year_ago %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if year_ago %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                {% with current=quarter_data.surplus last=last_quarter_data.surplus year_ago=year_ago_data.surplus %}
+                <tr class="hover:bg-slate-100 transition font-medium">
+                    <td class="px-6 py-3 text-slate-800">Surplus</td>
+                    <td class="px-6 py-3 text-right {% if current >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">${{ current|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ last|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > last %}text-emerald-600{% elif current < last %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if last %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">${{ year_ago|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-3 text-right {% if current > year_ago %}text-emerald-600{% elif current < year_ago %}text-rose-600{% else %}text-slate-600{% endif %}">
+                        {% if year_ago %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                <!-- Balance Section -->
+                <tr class="bg-slate-100">
+                    <td colspan="6" class="px-6 py-2 font-semibold text-slate-700">Balance Sheet</td>
+                </tr>
+
+                {% with current=quarter_data.networth last=last_quarter_data.networth year_ago=year_ago_data.networth %}
+                <tr class="hover:bg-slate-100 transition font-medium">
+                    <td class="px-6 py-3 text-slate-800">Net Worth</td>
+                    <td class="px-6 py-3 text-right text-blue-600">
+                        {% if current is not None %}${{ current|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if last is not None %}${{ last|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and last %}{% if current > last %}text-emerald-600{% elif current < last %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and last is not None and last != 0 %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if year_ago is not None %}${{ year_ago|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and year_ago %}{% if current > year_ago %}text-emerald-600{% elif current < year_ago %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and year_ago is not None and year_ago != 0 %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                {% with current=quarter_data.assets last=last_quarter_data.assets year_ago=year_ago_data.assets %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-3 text-slate-800">Total Assets</td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if current is not None %}${{ current|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if last is not None %}${{ last|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and last %}{% if current > last %}text-emerald-600{% elif current < last %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and last is not None and last != 0 %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if year_ago is not None %}${{ year_ago|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and year_ago %}{% if current > year_ago %}text-emerald-600{% elif current < year_ago %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and year_ago is not None and year_ago != 0 %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+                {% with current=quarter_data.liabilities last=last_quarter_data.liabilities year_ago=year_ago_data.liabilities %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-3 text-slate-800">Total Liabilities</td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if current is not None %}${{ current|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if last is not None %}${{ last|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and last %}{% if current < last %}text-emerald-600{% elif current > last %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and last is not None and last != 0 %}
+                            {% widthratio current last 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right text-slate-600">
+                        {% if year_ago is not None %}${{ year_ago|floatformat:0|intcomma }}{% else %}--{% endif %}
+                    </td>
+                    <td class="px-6 py-3 text-right {% if current and year_ago %}{% if current < year_ago %}text-emerald-600{% elif current > year_ago %}text-rose-600{% else %}text-slate-600{% endif %}{% endif %}">
+                        {% if current is not None and year_ago is not None and year_ago != 0 %}
+                            {% widthratio current year_ago 100 as pct %}
+                            {{ pct|add:"-100" }}%
+                        {% else %}--{% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% else %}
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-8 text-center">
+    <p class="text-slate-500">Select a quarter to view the report</p>
+</div>
+{% endif %}
+{% endblock %}

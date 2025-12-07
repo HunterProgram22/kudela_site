@@ -14,4 +14,6 @@ urlpatterns = [
     path('taxes/', views.tax_list, name='tax_list'),
     path('taxes/add/', views.tax_add, name='tax_add'),
     path('taxes/<int:pk>/edit/', views.tax_edit, name='tax_edit'),
+    path('analysis/', views.analysis, name='analysis'),
+    path('reports/', views.reports, name='reports'),
 ]

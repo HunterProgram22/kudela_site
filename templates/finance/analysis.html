@@ -1,0 +1,172 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Financial Analysis</h1>
+    <p class="text-slate-600">Visualize trends over time</p>
+</div>
+
+<!-- Filters -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6 mb-6">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+
+        <!-- Data Type -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Data Type</label>
+            <select name="type" id="dataType" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="balance" {% if data_type == 'balance' %}selected{% endif %}>Balance Sheet</option>
+                <option value="income" {% if data_type == 'income' %}selected{% endif %}>Income Statement</option>
+            </select>
+        </div>
+
+        <!-- Category -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <select name="category" id="categorySelect" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <optgroup label="Balance Sheet" id="balanceOptions" {% if data_type == 'income' %}disabled{% endif %}>
+                    {% for name, value in balance_categories.items %}
+                        <option value="{{ value }}" {% if category == value and data_type == 'balance' %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </optgroup>
+                <optgroup label="Income Statement" id="incomeOptions" {% if data_type == 'balance' %}disabled{% endif %}>
+                    {% for name, value in income_categories.items %}
+                        <option value="{{ value }}" {% if category == value and data_type == 'income' %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- Year Filter -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">Year</label>
+            <select name="year" class="w-full bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Years</option>
+                {% for date in available_years %}
+                    <option value="{{ date.year }}" {% if selected_year == date.year|stringformat:"s" %}selected{% endif %}>
+                        {{ date.year }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Submit -->
+        <div>
+            <button type="submit" class="w-full bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition">
+                Update Chart
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Chart -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">
+        {{ category_name }}
+        {% if selected_year %} - {{ selected_year }}{% endif %}
+    </h2>
+
+    {% if chart_labels %}
+    <div class="h-96">
+        <canvas id="analysisChart"></canvas>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200">
+        <div>
+            <p class="text-sm text-slate-500">Current</p>
+            <p class="text-xl font-bold text-slate-800">${{ chart_data|last|floatformat:0|intcomma }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-500">Highest</p>
+            <p class="text-xl font-bold text-emerald-600">${{ chart_data|dictsort:0|last|floatformat:0|intcomma }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-500">Lowest</p>
+            <p class="text-xl font-bold text-rose-600">${{ chart_data|dictsort:0|first|floatformat:0|intcomma }}</p>
+        </div>
+        <div>
+            <p class="text-sm text-slate-500">Data Points</p>
+            <p class="text-xl font-bold text-slate-800">{{ chart_labels|length }}</p>
+        </div>
+    </div>
+    {% else %}
+    <div class="h-96 flex items-center justify-center bg-slate-100 rounded-lg">
+        <p class="text-slate-400">No data available for the selected criteria</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if chart_labels %}
+<script>
+    const ctx = document.getElementById('analysisChart').getContext('2d');
+
+    // Determine color based on data type
+    const isLiability = ['total_liabilities', 'total_credit', 'total_loan', 'total_expenses', 'total_taxes'].includes('{{ category }}');
+    const borderColor = isLiability ? 'rgb(244, 63, 94)' : 'rgb(16, 185, 129)';
+    const backgroundColor = isLiability ? 'rgba(244, 63, 94, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: '{{ category_name }}',
+                data: {{ chart_data|safe }},
+                borderColor: borderColor,
+                backgroundColor: backgroundColor,
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Update category options based on data type selection
+    document.getElementById('dataType').addEventListener('change', function() {
+        const balanceOptions = document.getElementById('balanceOptions');
+        const incomeOptions = document.getElementById('incomeOptions');
+        const categorySelect = document.getElementById('categorySelect');
+
+        if (this.value === 'balance') {
+            balanceOptions.disabled = false;
+            incomeOptions.disabled = true;
+            categorySelect.value = 'networth';
+        } else {
+            balanceOptions.disabled = true;
+            incomeOptions.disabled = false;
+            categorySelect.value = 'total_income';
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
