@@ -378,7 +378,6 @@ def analysis(request):
     return render(request, 'finance/analysis.html', context)
 
 
-@login_required
 def get_quarter_data(quarter, year):
     """Get income and balance data for a specific quarter."""
     # Define quarter month ranges
