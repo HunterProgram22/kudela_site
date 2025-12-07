@@ -510,3 +510,175 @@ def reports(request):
 
     return render(request, 'finance/reports.html', context)
 
+
+@login_required
+def balance_detail(request, pk):
+    balance = get_object_or_404(MonthBal, pk=pk)
+
+    # Group fields for organized display
+    field_groups = {
+        'Checking Accounts': [
+            ('Huntington Checking', balance.huntington_check),
+            ('Fifth Third Checking', balance.fifththird_check),
+            ('Total Checking', balance.total_check()),
+        ],
+        'Savings Accounts': [
+            ('Huntington Savings', balance.huntington_save),
+            ('Fifth Third Savings', balance.fifththird_save),
+            ('Capital One Savings', balance.capone_save),
+            ('Amex Savings', balance.amex_save),
+            ('Total Savings', balance.total_save()),
+        ],
+        'Investments': [
+            ('Robinhood', balance.robinhood_invest),
+            ('Deacon', balance.deacon_invest),
+            ('Buckeye', balance.buckeye_invest),
+            ('Total Investments', balance.total_invest()),
+        ],
+        'Retirement': [
+            ('OPERS', balance.opers_retire),
+            ('457', balance.four57_retire),
+            ('401k', balance.four01_retire),
+            ('Roth', balance.roth_retire),
+            ('Total Retirement', balance.total_retire()),
+        ],
+        'Property': [
+            ('Main Home', balance.main_home),
+            ('Justin Car', balance.justin_car),
+            ('Kat Car', balance.kat_car),
+            ('Total Property', balance.total_property()),
+        ],
+        'Credit Cards': [
+            ('Capital One', balance.capone_credit),
+            ('Amex', balance.amex_credit),
+            ('Discover', balance.discover_credit),
+            ('Total Credit Cards', balance.total_credit()),
+        ],
+        'Loans': [
+            ('Car Loan', balance.car_loan),
+            ('Public Student Loan', balance.pubstudent_loan),
+            ('Private Student Loan', balance.privstudent_loan),
+            ('Mortgage', balance.main_mortgage),
+            ('Total Loans', balance.total_loan()),
+        ],
+    }
+
+    context = {
+        'balance': balance,
+        'field_groups': field_groups,
+    }
+
+    return render(request, 'finance/balance_detail.html', context)
+
+
+@login_required
+def income_detail(request, pk):
+    income = get_object_or_404(MonthInc, pk=pk)
+
+    # Group fields for organized display
+    field_groups = {
+        'Interest Income': [
+            ('Huntington Interest', income.huntington_interest),
+            ('Fifth Third Interest', income.fifththird_interest),
+            ('Capital One Interest', income.capone_interest),
+            ('Amex Interest', income.amex_interest),
+            ('Schwab Interest', income.schwab_interest),
+            ('Total Interest', income.total_interest()),
+        ],
+        'Salary & Dividends': [
+            ('Supreme Court Salary', income.supremecourt_salary),
+            ('CDM Salary', income.cdm_salary),
+            ('Schwab Dividends', income.schwab_dividends),
+            ('Total Salary', income.total_salary()),
+        ],
+        'Other Income': [
+            ('Expense Checks', income.expense_checks),
+            ('Miscellaneous', income.miscellaneous_income),
+            ('Refunds/Rebates', income.refund_rebate_repayment),
+            ('Gifts', income.gift_income),
+            ('Total Other Income', income.total_other_income()),
+        ],
+        'Retirement Contributions': [
+            ('OPERS', income.opers_retirement),
+            ('457b', income.four57b_retirement),
+            ('401k', income.four01k_retirement),
+            ('Roth', income.roth_retirement),
+            ('Total Retirement', income.total_retirement_contributions()),
+        ],
+        'Investment Contributions': [
+            ('Robinhood', income.robinhood_investments),
+            ('Schwab', income.schwab_investments),
+            ('Total Investments', income.total_investment_contributions()),
+        ],
+        'Savings Contributions': [
+            ('Amex Savings', income.amex_savings),
+            ('Fifth Third Savings', income.fifththird_savings),
+            ('Capital One Savings', income.capone_savings),
+            ('529 College', income.five29_college),
+            ('Huntington Savings', income.huntington_savings),
+            ('Total Savings', income.total_savings_contributions()),
+        ],
+        'Taxes': [
+            ('Federal Tax', income.federal_tax),
+            ('Social Security', income.social_security),
+            ('Medicare', income.medicare),
+            ('Ohio Tax', income.ohio_tax),
+            ('Columbus Tax', income.columbus_tax),
+            ('Total Taxes', income.total_taxes()),
+        ],
+        'Benefits': [
+            ('Health Insurance', income.health_insurance),
+            ('Supplemental Life', income.supplementallife_insurance),
+            ('Flex Spending', income.flex_spending),
+            ('CDM STD', income.cdm_std),
+            ('CDM Supplemental LTD', income.cdmsupplemental_ltd),
+            ('Parking', income.parking),
+            ('Parking Admin', income.parking_admin),
+            ('Total Benefits', income.total_benefits()),
+        ],
+        'Housing': [
+            ('Mortgage', income.main_mortgage),
+            ('HOA Fees', income.hoa_fees),
+            ('Total Housing', income.total_housing()),
+        ],
+        'Utilities': [
+            ('AEP Electric', income.aep_electric),
+            ('Rumpke Trash', income.rumpke_trash),
+            ('Delaware Sewer', income.delaware_sewer),
+            ('Delco Water', income.delco_water),
+            ('Suburban Gas', income.suburban_gas),
+            ('Verizon (Kat)', income.verizon_kat),
+            ('Sprint (Justin)', income.sprint_justin),
+            ('DirecTV', income.directtv_cable),
+            ('Internet', income.timewarner_internet),
+            ('Total Utilities', income.total_utilities()),
+        ],
+        'Loan Payments': [
+            ('Auto Loan', income.caponeauto_loan),
+            ('Public Student Loan', income.public_loan),
+            ('Private Student Loan', income.private_loan),
+            ('Total Loans', income.total_loans()),
+        ],
+        'Credit Card Payments': [
+            ('Capital One', income.capone_creditcard),
+            ('Amex', income.amex_creditcard),
+            ('Discover', income.discover_creditcard),
+            ('Kohls/VS/Macy/EB', income.kohls_vicsec_macy_eddiebauer_creditcards),
+            ('Kat Work Card', income.katwork_creditcard),
+            ('Total Credit Cards', income.total_personal_creditcards()),
+        ],
+        'Other Expenses': [
+            ('Auto Insurance', income.auto_insurance),
+            ('Cash/Check Purchases', income.cashorcheck_purchases),
+            ('Daycare', income.daycare),
+            ('Tax Deductible Giving', income.taxdeductible_giving),
+        ],
+    }
+
+    context = {
+        'income': income,
+        'field_groups': field_groups,
+    }
+
+    return render(request, 'finance/income_detail.html', context)
+

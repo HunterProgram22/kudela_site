@@ -75,7 +75,10 @@
                     <td class="px-6 py-4 text-right font-bold {% if income.total_surplus >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
                         ${{ income.total_surplus|floatformat:0|intcomma }}
                     </td>
-                    <td>
+                    <td class="px-6 py-4 text-center">
+                        <a href="{% url 'finance:income_detail' income.pk %}" class="text-slate-600 hover:text-slate-800 mr-3">
+                            <i data-lucide="eye" class="w-4 h-4 inline"></i>View
+                        </a>
                         <a href="{% url 'finance:income_edit' income.pk %}" class="text-blue-600 hover:text-blue-800">
                             <i data-lucide="pencil" class="w-4 h-4 inline"></i>Edit
                         </a>

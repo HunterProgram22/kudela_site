@@ -1,0 +1,53 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Balance Sheet</h1>
+        <p class="text-slate-600">{{ balance.date|date:"F Y" }}</p>
+    </div>
+    <div class="flex gap-3">
+        <a href="{% url 'finance:balance_edit' balance.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+            Edit
+        </a>
+        <a href="{% url 'finance:balance_list' %}" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition">
+            Back to List
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg shadow-lg p-6 text-white">
+        <p class="text-sm text-slate-300 uppercase tracking-wide">Net Worth</p>
+        <p class="text-2xl font-bold">${{ balance.networth|floatformat:0|intcomma }}</p>
+    </div>
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <p class="text-sm text-slate-500 uppercase tracking-wide">Total Assets</p>
+        <p class="text-2xl font-bold text-emerald-600">${{ balance.total_assets|floatformat:0|intcomma }}</p>
+    </div>
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <p class="text-sm text-slate-500 uppercase tracking-wide">Total Liabilities</p>
+        <p class="text-2xl font-bold text-rose-600">${{ balance.total_liabilities|floatformat:0|intcomma }}</p>
+    </div>
+</div>
+
+<!-- Detail Groups -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {% for group_name, fields in field_groups.items %}
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ group_name }}</h2>
+        <div class="space-y-2">
+            {% for label, value in fields %}
+            <div class="flex justify-between items-center {% if 'Total' in label %}border-t border-slate-200 pt-2 mt-2 font-medium{% endif %}">
+                <span class="text-slate-600">{{ label }}</span>
+                <span class="{% if 'Total' in label %}text-slate-800{% else %}text-slate-600{% endif %}">${{ value|floatformat:2|intcomma }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

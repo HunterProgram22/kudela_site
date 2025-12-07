@@ -71,6 +71,9 @@
                     <td class="px-6 py-4 text-right text-rose-600 font-medium">${{ balance.total_liabilities|floatformat:0|intcomma }}</td>
                     <td class="px-6 py-4 text-right text-blue-600 font-bold">${{ balance.networth|floatformat:0|intcomma }}</td>
                     <td class="px-6 py-4 text-center">
+                        <a href="{% url 'finance:balance_detail' balance.pk %}" class="text-slate-600 hover:text-slate-800 mr-3">
+                            <i data-lucide="eye" class="w-4 h-4 inline"></i>View
+                        </a>
                         <a href="{% url 'finance:balance_edit' balance.pk %}" class="text-blue-600 hover:text-blue-800">
                             <i data-lucide="pencil" class="w-4 h-4 inline"></i>Edit
                         </a>
