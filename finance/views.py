@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import MonthBal, MonthInc
-from .forms import MonthBalForm, MonthIncForm
+from .models import MonthBal, MonthInc, TaxReturn
+from .forms import MonthBalForm, MonthIncForm, TaxReturnForm
 
 def home(request):
     # Get the most recent balance record
@@ -220,4 +220,52 @@ def income_edit(request, pk):
     }
 
     return render(request, 'finance/income_form.html', context)
+
+
+def tax_list(request):
+    taxes = TaxReturn.objects.all()
+
+    context = {
+        'taxes': taxes,
+    }
+
+    return render(request, 'finance/tax_list.html', context)
+
+
+def tax_add(request):
+    if request.method == 'POST':
+        form = TaxReturnForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tax return added successfully!')
+            return redirect('finance:tax_list')
+    else:
+        form = TaxReturnForm()
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'finance/tax_form.html', context)
+
+
+def tax_edit(request, pk):
+    tax = get_object_or_404(TaxReturn, pk=pk)
+
+    if request.method == 'POST':
+        form = TaxReturnForm(request.POST, instance=tax)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tax return updated successfully!')
+            return redirect('finance:tax_list')
+    else:
+        form = TaxReturnForm(instance=tax)
+
+    context = {
+        'form': form,
+        'editing': True,
+        'tax': tax,
+    }
+
+    return render(request, 'finance/tax_form.html', context)
 

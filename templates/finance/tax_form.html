@@ -1,0 +1,107 @@
+{% extends 'finance/base.html' %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">
+        {% if editing %}Edit Tax Return{% else %}Add Tax Return{% endif %}
+    </h1>
+    <p class="text-slate-600">
+        {% if editing %}Update {{ tax.year }} tax return{% else %}Enter annual tax return data{% endif %}
+    </p>
+</div>
+
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Year -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Tax Year</h2>
+        <div class="max-w-xs">
+            {{ form.year }}
+        </div>
+    </div>
+
+    <!-- Income -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Income</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total Job Wages</label>
+                {{ form.total_job_wages }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total Federal Wages</label>
+                {{ form.total_federal_wages }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total Income</label>
+                {{ form.total_income }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Adjusted Gross Income</label>
+                {{ form.adjusted_gross_income }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Deductions -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Deductions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Itemized Deduction Total</label>
+                {{ form.itemized_deduction_total }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Federal Taxable Income</label>
+                {{ form.federal_taxable_income }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Federal Tax -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Federal Tax</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total Federal Tax Owed</label>
+                {{ form.total_federal_tax_owed }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total Federal Payments</label>
+                {{ form.total_federal_payments }}
+            </div>
+        </div>
+    </div>
+
+    <!-- State Tax -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">State Tax</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">State Taxable Income</label>
+                {{ form.state_taxable_income }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total State Tax Owed</label>
+                {{ form.total_state_tax_owed }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Total State Payments</label>
+                {{ form.total_state_payments }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex gap-4">
+        <button type="submit" class="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition font-medium">
+            {% if editing %}Update Tax Return{% else %}Save Tax Return{% endif %}
+        </button>
+        <a href="{% url 'finance:tax_list' %}" class="bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition font-medium">
+            Cancel
+        </a>
+    </div>
+</form>
+{% endblock %}

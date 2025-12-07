@@ -1,0 +1,72 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Tax Returns</h1>
+        <p class="text-slate-600">Annual tax return summaries</p>
+    </div>
+
+    <a href="{% url 'finance:tax_add' %}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition flex items-center gap-2">
+        <i data-lucide="plus" class="w-5 h-5"></i>
+        Add Tax Return
+    </a>
+</div>
+
+<!-- Tax Table -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-700 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold">Year</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Total Wages</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">AGI</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Federal Tax</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Federal Paid</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Federal Refund</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">State Tax</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">State Paid</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">State Refund</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Total Refund</th>
+                    <th class="px-6 py-3 text-center text-sm font-semibold">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                {% for tax in taxes %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-4 text-slate-800 font-medium">{{ tax.year }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_job_wages|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.adjusted_gross_income|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_federal_tax_owed|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_federal_payments|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right {% if tax.federal_refund >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                        ${{ tax.federal_refund|floatformat:0|intcomma }}
+                    </td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_state_tax_owed|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ tax.total_state_payments|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right {% if tax.state_refund >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                        ${{ tax.state_refund|floatformat:0|intcomma }}
+                    </td>
+                    <td class="px-6 py-4 text-right font-bold {% if tax.total_refund >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                        ${{ tax.total_refund|floatformat:0|intcomma }}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <a href="{% url 'finance:tax_edit' tax.pk %}" class="text-blue-600 hover:text-blue-800">
+                            <i data-lucide="pencil" class="w-4 h-4 inline"></i>
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="11" class="px-6 py-8 text-center text-slate-500">No tax returns found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

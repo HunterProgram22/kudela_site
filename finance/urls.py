@@ -11,4 +11,7 @@ urlpatterns = [
     path('income/', views.income_list, name='income_list'),
     path('income/add/', views.income_add, name='income_add'),
     path('income/<int:pk>/edit/', views.income_edit, name='income_edit'),
+    path('taxes/', views.tax_list, name='tax_list'),
+    path('taxes/add/', views.tax_add, name='tax_add'),
+    path('taxes/<int:pk>/edit/', views.tax_edit, name='tax_edit'),
 ]
