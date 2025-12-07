@@ -4,8 +4,12 @@
 {% block finance_content %}
 <!-- Page Header -->
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-slate-800">Add Income Record</h1>
-    <p class="text-slate-600">Enter monthly income and expenses</p>
+    <h1 class="text-2xl font-bold text-slate-800">
+        {% if editing %}Edit Income Record{% else %}Add Income Record{% endif %}
+    </h1>
+    <p class="text-slate-600">
+        {% if editing %}Update {{ income.date|date:"F Y" }}{% else %}Enter monthly income and expenses{% endif %}
+    </p>
 </div>
 
 <form method="post" class="space-y-6">
@@ -42,7 +46,7 @@
     <!-- Submit Button -->
     <div class="flex gap-4">
         <button type="submit" class="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition font-medium">
-            Save Income Record
+            {% if editing %}Update Income Record{% else %}Save Income Record{% endif %}
         </button>
         <a href="{% url 'finance:income_list' %}" class="bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition font-medium">
             Cancel

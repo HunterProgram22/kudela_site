@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import MonthBal, MonthInc
 from .forms import MonthBalForm, MonthIncForm
@@ -78,6 +78,7 @@ def income_list(request):
 
     return render(request, 'finance/income_list.html', context)
 
+
 def balance_add(request):
     if request.method == 'POST':
         form = MonthBalForm(request.POST)
@@ -140,3 +141,83 @@ def income_add(request):
     }
 
     return render(request, 'finance/income_form.html', context)
+
+
+def balance_edit(request, pk):
+    balance = get_object_or_404(MonthBal, pk=pk)
+
+    if request.method == 'POST':
+        form = MonthBalForm(request.POST, instance=balance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Balance record updated successfully!')
+            return redirect('finance:balance_list')
+    else:
+        form = MonthBalForm(instance=balance)
+
+    field_groups = {
+        'Checking Accounts': ['huntington_check', 'fifththird_check'],
+        'Savings Accounts': ['huntington_save', 'fifththird_save', 'capone_save', 'amex_save'],
+        'Investments': ['robinhood_invest', 'deacon_invest', 'buckeye_invest'],
+        'Retirement': ['opers_retire', 'four57_retire', 'four01_retire', 'roth_retire'],
+        'Property': ['main_home', 'justin_car', 'kat_car'],
+        'Credit Cards': ['capone_credit', 'amex_credit', 'discover_credit'],
+        'Loans': ['car_loan', 'pubstudent_loan', 'privstudent_loan', 'main_mortgage'],
+    }
+
+    context = {
+        'form': form,
+        'field_groups': field_groups,
+        'editing': True,
+        'balance': balance,
+    }
+
+    return render(request, 'finance/balance_form.html', context)
+
+
+def income_edit(request, pk):
+    income = get_object_or_404(MonthInc, pk=pk)
+
+    if request.method == 'POST':
+        form = MonthIncForm(request.POST, instance=income)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Income record updated successfully!')
+            return redirect('finance:income_list')
+    else:
+        form = MonthIncForm(instance=income)
+
+    field_groups = {
+        'Interest Income': ['huntington_interest', 'fifththird_interest', 'capone_interest',
+                            'amex_interest', 'schwab_interest'],
+        'Salary & Dividends': ['supremecourt_salary', 'cdm_salary', 'schwab_dividends'],
+        'Other Income': ['expense_checks', 'miscellaneous_income', 'refund_rebate_repayment',
+                         'gift_income'],
+        'Retirement Contributions': ['opers_retirement', 'four57b_retirement', 'four01k_retirement',
+                                     'roth_retirement'],
+        'Investment Contributions': ['robinhood_investments', 'schwab_investments'],
+        'Savings Contributions': ['amex_savings', 'fifththird_savings', 'capone_savings',
+                                  'five29_college', 'huntington_savings'],
+        'Taxes': ['federal_tax', 'social_security', 'medicare', 'ohio_tax', 'columbus_tax'],
+        'Benefits': ['health_insurance', 'supplementallife_insurance', 'flex_spending', 'cdm_std',
+                     'cdmsupplemental_ltd', 'parking', 'parking_admin'],
+        'Housing': ['main_mortgage', 'hoa_fees'],
+        'Utilities': ['aep_electric', 'rumpke_trash', 'delaware_sewer', 'delco_water',
+                      'suburban_gas', 'verizon_kat', 'sprint_justin', 'directtv_cable',
+                      'timewarner_internet'],
+        'Loans': ['caponeauto_loan', 'public_loan', 'private_loan'],
+        'Credit Cards': ['capone_creditcard', 'amex_creditcard', 'discover_creditcard',
+                         'kohls_vicsec_macy_eddiebauer_creditcards', 'katwork_creditcard'],
+        'Other Expenses': ['auto_insurance', 'cashorcheck_purchases', 'daycare',
+                           'taxdeductible_giving'],
+    }
+
+    context = {
+        'form': form,
+        'field_groups': field_groups,
+        'editing': True,
+        'income': income,
+    }
+
+    return render(request, 'finance/income_form.html', context)
+
