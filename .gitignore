@@ -1,0 +1,31 @@
+git init
+```
+
+## Step 26: Create .gitignore File
+
+Create a file named `.gitignore` in the `kudela_site` folder (same level as manage.py):
+```
+# Environment
+.env
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Django
+*.log
+db.sqlite3
+staticfiles/
+media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
