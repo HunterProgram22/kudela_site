@@ -72,25 +72,26 @@
         <canvas id="analysisChart"></canvas>
     </div>
 
-    <!-- Summary Stats -->
+        <!-- Summary Stats -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200">
         <div>
             <p class="text-sm text-slate-500">Current</p>
-            <p class="text-xl font-bold text-slate-800">${{ chart_data|last|floatformat:0|intcomma }}</p>
+            <p class="text-xl font-bold text-slate-800">${{ current_value|floatformat:0|intcomma }}</p>
         </div>
         <div>
             <p class="text-sm text-slate-500">Highest</p>
-            <p class="text-xl font-bold text-emerald-600">${{ chart_data|dictsort:0|last|floatformat:0|intcomma }}</p>
+            <p class="text-xl font-bold text-emerald-600">${{ highest_value|floatformat:0|intcomma }}</p>
         </div>
         <div>
             <p class="text-sm text-slate-500">Lowest</p>
-            <p class="text-xl font-bold text-rose-600">${{ chart_data|dictsort:0|first|floatformat:0|intcomma }}</p>
+            <p class="text-xl font-bold text-rose-600">${{ lowest_value|floatformat:0|intcomma }}</p>
         </div>
         <div>
             <p class="text-sm text-slate-500">Data Points</p>
             <p class="text-xl font-bold text-slate-800">{{ chart_labels|length }}</p>
         </div>
     </div>
+
     {% else %}
     <div class="h-96 flex items-center justify-center bg-slate-100 rounded-lg">
         <p class="text-slate-400">No data available for the selected criteria</p>

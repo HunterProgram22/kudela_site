@@ -363,6 +363,15 @@ def analysis(request):
     category_name = [k for k, v in all_categories.items() if v == category][
         0] if category in all_categories.values() else category
 
+    if chart_data:
+        current_value = chart_data[-1] if chart_data else 0
+        highest_value = max(chart_data)
+        lowest_value = min(chart_data)
+    else:
+        current_value = 0
+        highest_value = 0
+        lowest_value = 0
+
     context = {
         'data_type': data_type,
         'category': category,
@@ -373,6 +382,9 @@ def analysis(request):
         'available_years': available_years,
         'chart_labels': chart_labels,
         'chart_data': chart_data,
+        'current_value': current_value,
+        'highest_value': highest_value,
+        'lowest_value': lowest_value,
     }
 
     return render(request, 'finance/analysis.html', context)
