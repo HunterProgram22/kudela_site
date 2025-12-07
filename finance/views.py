@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from decimal import Decimal
 from .models import MonthBal, MonthInc, TaxReturn
 from .forms import MonthBalForm, MonthIncForm, TaxReturnForm
 
+
+@login_required
 def home(request):
     # Get the most recent balance record
     latest_balance = MonthBal.objects.first()  # Already ordered by -date in model
@@ -39,6 +42,7 @@ def home(request):
     return render(request, 'finance/home.html', context)
 
 
+@login_required
 def balance_list(request):
     # Get all balance records
     balances = MonthBal.objects.all()
@@ -60,6 +64,7 @@ def balance_list(request):
     return render(request, 'finance/balance_list.html', context)
 
 
+@login_required
 def income_list(request):
     # Get all income records
     incomes = MonthInc.objects.all()
@@ -81,6 +86,7 @@ def income_list(request):
     return render(request, 'finance/income_list.html', context)
 
 
+@login_required
 def balance_add(request):
     if request.method == 'POST':
         form = MonthBalForm(request.POST)
@@ -110,6 +116,7 @@ def balance_add(request):
     return render(request, 'finance/balance_form.html', context)
 
 
+@login_required
 def income_add(request):
     if request.method == 'POST':
         form = MonthIncForm(request.POST)
@@ -145,6 +152,7 @@ def income_add(request):
     return render(request, 'finance/income_form.html', context)
 
 
+@login_required
 def balance_edit(request, pk):
     balance = get_object_or_404(MonthBal, pk=pk)
 
@@ -177,6 +185,7 @@ def balance_edit(request, pk):
     return render(request, 'finance/balance_form.html', context)
 
 
+@login_required
 def income_edit(request, pk):
     income = get_object_or_404(MonthInc, pk=pk)
 
@@ -224,6 +233,7 @@ def income_edit(request, pk):
     return render(request, 'finance/income_form.html', context)
 
 
+@login_required
 def tax_list(request):
     taxes = TaxReturn.objects.all()
 
@@ -234,6 +244,7 @@ def tax_list(request):
     return render(request, 'finance/tax_list.html', context)
 
 
+@login_required
 def tax_add(request):
     if request.method == 'POST':
         form = TaxReturnForm(request.POST)
@@ -251,6 +262,7 @@ def tax_add(request):
     return render(request, 'finance/tax_form.html', context)
 
 
+@login_required
 def tax_edit(request, pk):
     tax = get_object_or_404(TaxReturn, pk=pk)
 
@@ -272,6 +284,7 @@ def tax_edit(request, pk):
     return render(request, 'finance/tax_form.html', context)
 
 
+@login_required
 def analysis(request):
     # Define available categories for analysis
     balance_categories = {
@@ -357,6 +370,7 @@ def analysis(request):
     return render(request, 'finance/analysis.html', context)
 
 
+@login_required
 def get_quarter_data(quarter, year):
     """Get income and balance data for a specific quarter."""
     # Define quarter month ranges
@@ -418,6 +432,7 @@ def get_quarter_data(quarter, year):
     return totals
 
 
+@login_required
 def reports(request):
     # Get available years from data
     available_years = MonthInc.objects.dates('date', 'year', order='DESC')
