@@ -34,3 +34,24 @@ def home(request):
     }
 
     return render(request, 'finance/home.html', context)
+
+
+def balance_list(request):
+    # Get all balance records
+    balances = MonthBal.objects.all()
+
+    # Get filter parameters
+    year = request.GET.get('year')
+    if year:
+        balances = balances.filter(date__year=year)
+
+    # Get available years for filter dropdown
+    available_years = MonthBal.objects.dates('date', 'year', order='DESC')
+
+    context = {
+        'balances': balances,
+        'available_years': available_years,
+        'selected_year': year,
+    }
+
+    return render(request, 'finance/balance_list.html', context)

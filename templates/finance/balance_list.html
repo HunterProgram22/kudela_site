@@ -1,0 +1,74 @@
+{% extends 'finance/base.html' %}
+{% load humanize %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Balance Sheet</h1>
+        <p class="text-slate-600">Monthly balance snapshots</p>
+    </div>
+
+    <!-- Year Filter -->
+    <form method="get" class="flex items-center gap-3">
+        <select name="year" class="bg-white border border-slate-300 rounded-lg px-4 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Years</option>
+            {% for date in available_years %}
+                <option value="{{ date.year }}" {% if selected_year == date.year|stringformat:"s" %}selected{% endif %}>
+                    {{ date.year }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="bg-slate-700 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition">
+            Filter
+        </button>
+    </form>
+</div>
+
+<!-- Balance Table -->
+<div class="bg-slate-50 rounded-lg shadow border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-700 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold">Date</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Checking</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Savings</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Investments</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Retirement</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Property</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Assets</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Liabilities</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold">Net Worth</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200">
+                {% for balance in balances %}
+                <tr class="hover:bg-slate-100 transition">
+                    <td class="px-6 py-4 text-slate-800 font-medium">{{ balance.date|date:"M Y" }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ balance.total_check|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ balance.total_save|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ balance.total_invest|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ balance.total_retire|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-slate-600">${{ balance.total_property|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-emerald-600 font-medium">${{ balance.total_assets|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-rose-600 font-medium">${{ balance.total_liabilities|floatformat:0|intcomma }}</td>
+                    <td class="px-6 py-4 text-right text-blue-600 font-bold">${{ balance.networth|floatformat:0|intcomma }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="px-6 py-8 text-center text-slate-500">No balance records found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Summary -->
+{% if balances %}
+<div class="mt-6 text-sm text-slate-600">
+    Showing {{ balances|length }} record{{ balances|length|pluralize }}
+</div>
+{% endif %}
+{% endblock %}
