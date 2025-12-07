@@ -27,10 +27,3 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('finance/', include('finance.urls')),
 ]
-
-# Debug toolbar URLs (only in debug mode)
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns

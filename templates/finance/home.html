@@ -18,29 +18,30 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
     <!-- Net Worth Card -->
-    <div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm text-slate-300 uppercase tracking-wide">Net Worth</p>
-                <p class="text-2xl font-bold">
-                    {% if latest_balance %}
-                        ${{ latest_balance.networth|floatformat:0|intcomma }}
-                    {% else %}
-                        --
-                    {% endif %}
-                </p>
-            </div>
-            <div class="bg-slate-600 p-3 rounded-full">
-                <i data-lucide="wallet" class="w-6 h-6 text-blue-300"></i>
-            </div>
+<!-- Net Worth Card -->
+<div class="bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg shadow-lg p-6 text-white">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm text-slate-300 uppercase tracking-wide">Net Worth</p>
+            <p class="text-2xl font-bold">
+                {% if latest_balance %}
+                    ${{ latest_balance.networth|floatformat:0|intcomma }}
+                {% else %}
+                    --
+                {% endif %}
+            </p>
         </div>
-        {% if latest_income %}
-        <p class="text-sm text-emerald-300 mt-2">
-            <i data-lucide="trending-up" class="w-4 h-4 inline"></i>
-            ${{ latest_income.total_surplus|floatformat:0|intcomma }} surplus this month
-        </p>
-        {% endif %}
+        <div class="bg-slate-600 p-3 rounded-full">
+            <i data-lucide="wallet" class="w-6 h-6 text-blue-300"></i>
+        </div>
     </div>
+    {% if latest_income %}
+    <p class="text-sm {% if latest_income.total_surplus >= 0 %}text-emerald-300{% else %}text-rose-300{% endif %} mt-2">
+        <i data-lucide="{% if latest_income.total_surplus >= 0 %}trending-up{% else %}trending-down{% endif %}" class="w-4 h-4 inline"></i>
+        ${{ latest_income.total_surplus|floatformat:0|intcomma }} {% if latest_income.total_surplus >= 0 %}surplus{% else %}deficit{% endif %} for {{ latest_income.date|date:"F Y" }}
+    </p>
+    {% endif %}
+</div>
 
     <!-- Total Assets Card -->
     <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
