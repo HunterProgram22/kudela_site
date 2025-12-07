@@ -1,0 +1,52 @@
+{% extends 'finance/base.html' %}
+{% load form_tags %}
+
+{% block finance_content %}
+<!-- Page Header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-800">Add Balance Record</h1>
+    <p class="text-slate-600">Enter monthly balance snapshot</p>
+</div>
+
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Date Field -->
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">Record Date</h2>
+        <div class="max-w-xs">
+            {{ form.date }}
+        </div>
+        {% if form.date.errors %}
+            <p class="text-rose-600 text-sm mt-1">{{ form.date.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Field Groups -->
+    {% for group_name, fields in field_groups.items %}
+    <div class="bg-slate-50 rounded-lg shadow border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ group_name }}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for field_name in fields %}
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        {{ form|get_field:field_name|field_label }}
+                    </label>
+                    {{ form|get_field:field_name }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Submit Button -->
+    <div class="flex gap-4">
+        <button type="submit" class="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition font-medium">
+            Save Balance Record
+        </button>
+        <a href="{% url 'finance:balance_list' %}" class="bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition font-medium">
+            Cancel
+        </a>
+    </div>
+</form>
+{% endblock %}
